@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%231a1a1a'/><text x='50' y='65' font-family='sans-serif' font-weight='bold' font-size='50' fill='%23f4f4f0' text-anchor='middle'>AD</text></svg>">
+    
+    <title>Ankan Debbarma | Creative Portfolio</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- VARIABLES --- */
+        :root {
+            --bg: #f2f2ee;
+            --text: #111111;
+            --text-light: #555;
+            --accent: #FF4D00;
+            --line: rgba(0,0,0,0.08);
+            --font-head: 'Syne', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --easing: cubic-bezier(0.77, 0, 0.175, 1);
+        }
+
+        /* --- RESET --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            width: 100%;
+            opacity: 0; 
+            transition: opacity 0.5s ease;
+            cursor: none; 
+        }
+
+        body.loaded { opacity: 1; }
+        body.modal-open { overflow: hidden; }
+
+        /* --- PRELOADER --- */
+        .preloader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #111; z-index: 9999999;
+            display: flex; justify-content: center; align-items: center;
+            color: #fff; font-family: var(--font-head); font-size: 2rem;
+            transform: translateY(0); transition: transform 1s var(--easing);
+        }
+        .preloader.hide { transform: translateY(-100%); }
+
+        /* --- CURSOR (DESKTOP ONLY) --- */
+        .cursor-dot, .cursor-outline {
+            position: fixed; top: 0; left: 0; border-radius: 50%; pointer-events: none; 
+            z-index: 999999; transform: translate(-50%, -50%);
+            mix-blend-mode: difference; color: white;
+        }
+        .cursor-dot { width: 10px; height: 10px; background-color: white; }
+        .cursor-outline {
+            width: 50px; height: 50px; border: 1px solid white;
+            transition: width 0.3s, height 0.3s, background-color 0.3s;
+        }
+        
+        /* Hover States */
+        body:has(a:hover) .cursor-outline, 
+        body:has(button:hover) .cursor-outline,
+        body:has(.project-card:hover) .cursor-outline,
+        body:has(.exp-row:hover) .cursor-outline {
+            width: 80px; height: 80px; background: white; border-color: transparent;
+        }
+
+        /* --- LAYOUT --- */
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 5vw; }
+
+        /* --- NAV --- */
+        nav { padding: 2rem 0; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* 2. UPDATED LOGO STYLING */
+        .logo { 
+            font-family: var(--font-head); 
+            font-weight: 800; /* Extra bold for logo feel */
+            font-size: 1.5rem; 
+            text-decoration: none; 
+            color: var(--text); 
+            z-index: 10;
+            letter-spacing: -0.5px; /* Tighter tracking looks more like a logo */
+        }
+
+        .nav-links { display: flex; gap: 3rem; align-items: center; z-index: 10; }
+        .nav-link { text-decoration: none; color: var(--text); font-size: 0.95rem; font-weight: 500; }
+        .call-btn {
+            padding: 0.8rem 1.8rem; border: 1px solid var(--text); border-radius: 50px;
+            text-decoration: none; color: var(--text); font-weight: 500; transition: all 0.3s;
+        }
+        .call-btn:hover { background: var(--text); color: white; }
+
+        /* --- HERO --- */
+        .hero { min-height: 80vh; display: flex; flex-direction: column; justify-content: center; }
+        .char { display: inline-block; opacity: 0; transform: translateY(100%); transition: transform 0.8s var(--easing), opacity 0.8s; }
+        .char.visible { opacity: 1; transform: translateY(0); }
+        h1 {
+            font-family: var(--font-head); font-size: clamp(3rem, 9vw, 8.5rem);
+            line-height: 0.9; font-weight: 800; letter-spacing: -0.03em; margin-left: -5px;
+            margin-bottom: 2rem;
+        }
+        .hero-sub {
+            font-size: clamp(1rem, 2vw, 1.5rem); color: var(--text-light); max-width: 600px;
+            margin-bottom: 3rem; opacity: 0; transform: translateY(20px); transition: 1s var(--easing) 0.5s;
+        }
+        .hero-sub.visible { opacity: 1; transform: translateY(0); }
+
+        /* --- ABOUT --- */
+        .about-section { padding: 8rem 0; border-top: 1px solid var(--line); }
+        .about-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 4rem; }
+        .section-label { font-family: var(--font-head); font-size: 1.2rem; font-weight: 700; color: var(--text); }
+        .bio-text { font-size: 1.5rem; line-height: 1.5; font-weight: 400; margin-bottom: 3rem; }
+        .skills-list { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .skill-tag { 
+            padding: 0.5rem 1rem; border: 1px solid var(--line); border-radius: 50px; 
+            font-size: 0.9rem; color: var(--text-light); transition: 0.3s;
+        }
+        .skill-tag:hover { background: #111; color: #fff; }
+
+        /* --- EXPERIENCE --- */
+        .experience-section { padding: 2rem 0 8rem; }
+        .exp-row {
+            display: grid; grid-template-columns: 1fr 2fr 1fr;
+            padding: 2.5rem 0; border-top: 1px solid var(--line);
+            transition: 0.3s; cursor: default;
+        }
+        .exp-row:last-child { border-bottom: 1px solid var(--line); }
+        .exp-row:hover { padding-left: 20px; background: rgba(0,0,0,0.02); }
+        .exp-company { font-family: var(--font-head); font-weight: 700; font-size: 1.2rem; }
+        .exp-role { font-size: 1.1rem; color: var(--text-light); }
+        .exp-date { text-align: right; font-family: 'Inter', monospace; font-size: 0.9rem; color: var(--text-light); }
+
+        /* --- WORK --- */
+        .section-header {
+            display: flex; justify-content: space-between; align-items: flex-end; 
+            margin-bottom: 4rem; padding-bottom: 1rem; border-bottom: 1px solid var(--line);
+        }
+        .section-title { font-family: var(--font-head); font-size: 2rem; font-weight: 700; }
+        .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 4rem; }
+        .project-card { display: block; group: relative; cursor: pointer; }
+        
+        .p-image-wrap {
+            width: 100%; aspect-ratio: 4/3; overflow: hidden; border-radius: 8px;
+            margin-bottom: 1.5rem; background: #ddd; position: relative;
+        }
+        
+        .p-image {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: transform 0.7s var(--easing), filter 0.5s; 
+            filter: grayscale(100%);
+        }
+        .project-card:hover .p-image { transform: scale(1.1); filter: grayscale(0%); }
+        .p-info h3 { font-family: var(--font-head); font-size: 1.5rem; margin-bottom: 0.5rem; }
+
+        /* --- FOOTER --- */
+        footer { background: #0a0a0a; color: #f2f2ee; padding: 8rem 0 3rem; margin-top: 8rem; }
+        .footer-cta {
+            font-family: var(--font-head); font-size: clamp(3rem, 9vw, 8rem);
+            font-weight: 800; line-height: 0.9; margin-bottom: 4rem; display: block;
+            color: #f2f2ee; text-decoration: none; transition: 0.3s;
+        }
+        .footer-cta:hover { color: var(--accent); }
+        .footer-links a { color: #888; text-decoration: none; margin-right: 2rem; transition: 0.3s; }
+        .footer-links a:hover { color: #fff; }
+
+        /* --- MODAL --- */
+        .project-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg); z-index: 20000; overflow-y: auto;
+            transform: translateY(100%); transition: transform 0.8s var(--easing);
+            -webkit-overflow-scrolling: touch;
+        }
+        .project-modal.active { transform: translateY(0); }
+        
+        .modal-nav {
+            position: sticky; top: 0; display: flex; justify-content: space-between;
+            padding: 2rem 5vw; background: rgba(242, 242, 238, 0.95);
+            border-bottom: 1px solid var(--line); z-index: 50;
+        }
+        
+        .close-btn { background: none; border: none; font-family: var(--font-head); font-size: 1.2rem; font-weight: 700; padding: 10px; }
+        .modal-content { padding: 4rem 5vw; max-width: 1400px; margin: 0 auto; }
+        .m-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 4rem 0; }
+        .m-img { width: 100%; height: auto; border-radius: 4px; object-fit: cover; }
+        .m-img.full { grid-column: 1 / -1; }
+
+        /* --- MOBILE OPTIMIZATION --- */
+        @media (max-width: 768px) {
+            .cursor-dot, .cursor-outline { display: none !important; }
+            body { cursor: auto !important; }
+            .project-card { cursor: pointer; }
+
+            .nav-links { display: none; }
+            nav { padding: 1.5rem 0; }
+            
+            /* Logo sizing for mobile so name fits */
+            .logo { font-size: 1.1rem; } 
+            
+            .bio-text { font-size: 1.1rem; }
+            .about-grid, .project-grid, .m-grid { grid-template-columns: 1fr; gap: 2rem; }
+            .exp-row { grid-template-columns: 1fr; gap: 0.5rem; padding: 1.5rem 0; }
+            .exp-date { text-align: left; grid-row: 1; font-size: 0.8rem; color: var(--accent); margin-bottom: 5px; }
+            .exp-company { grid-row: 2; }
+            .exp-role { grid-row: 3; }
+            .modal-nav { backdrop-filter: none; background: #f2f2ee; }
+            .m-img { aspect-ratio: 16/9; }
+        }
+
+        .reveal-on-scroll { opacity: 0; transform: translateY(30px); transition: all 1s var(--easing); }
+        .reveal-on-scroll.active { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+    <div class="preloader" id="preloader"><div>ANKAN</div></div>
+    
+    <div class="cursor-dot" data-cursor-dot></div>
+    <div class="cursor-outline" data-cursor-outline></div>
+
+    <div class="container">
+        <nav>
+            <a href="#" class="logo">Ankan Debbarma</a>
+            
+            <div class="nav-links">
+                <a href="#about" class="nav-link">About</a>
+                <a href="#experience" class="nav-link">Experience</a>
+                <a href="#work" class="nav-link">Work</a>
+                <a href="tel:+919233692273" class="call-btn">Let's Talk</a>
+            </div>
+            <a href="tel:+919233692273" class="call-btn" style="display: none; @media(max-width:768px){display:block;}">Call</a>
+        </nav>
+
+        <header class="hero">
+            <h1 id="hero-title">Creative<br>Developer &<br>Designer.</h1>
+            <p class="hero-sub" id="hero-sub">I help ambitious brands stand out through immersive web experiences and strategic design.</p>
+        </header>
+
+        <section id="about" class="about-section reveal-on-scroll">
+            <div class="about-grid">
+                <div class="section-label">01 / Profile</div>
+                <div>
+                    <p class="bio-text">
+                        I'm a Creative Developer & Designer who brings ideas to life through thoughtful design and clean code. I build websites that look great and work seamlessly, blending creativity with technical expertise.<br><br>
+                        As Co-Founder of a web development agency, I've learned that great digital experiences require more than just design and development—they need strategic planning and smart management.
+                    </p>
+                    <div style="margin-top: 2rem;">
+                        <div style="font-family: var(--font-head); font-weight: 700; margin-bottom: 1rem;">Tech Stack & Skills</div>
+                        <div class="skills-list">
+                            <span class="skill-tag">JavaScript (ES6+)</span>
+                            <span class="skill-tag">React / Next.js</span>
+                            <span class="skill-tag">GSAP / Three.js</span>
+                            <span class="skill-tag">Node.js</span>
+                            <span class="skill-tag">Figma</span>
+                            <span class="skill-tag">Photoshop</span>
+                            <span class="skill-tag">Canva</span>
+                            <span class="skill-tag">Management</span>
+                 
+                        </div>
+                    </div> 
+                </div>
+            </div>
+        </section>
+
+        <section id="experience" class="experience-section reveal-on-scroll">
+            <div style="margin-bottom: 2rem;" class="section-label">02 / Experience</div>
+            <div class="exp-list">
+                <div class="exp-row">
+                    <div class="exp-company">Mewcin</div>
+                    <div class="exp-role">Co-Founder & CEO</div>
+                    <div class="exp-date">2025 — Present</div>
+                </div>
+                <!-- <div class="exp-row">
+                    <div class="exp-company">Freelance</div>
+                    <div class="exp-role">Frontend Engineer</div>
+                    <div class="exp-date">2023 — 2025</div>
+                </div> -->
+            </div>
+        </section>
+
+        <section id="work" style="padding: 4rem 0;">
+            <div class="section-header reveal-on-scroll">
+                <h2 class="section-title">Selected Work</h2>
+                <div style="font-family: var(--font-code); color: var(--text-light);">03 / Portfolio</div>
+            </div>
+
+            <div class="project-grid">
+                <div class="project-card reveal-on-scroll" onclick="openProject(1)">
+                    <div class="p-image-wrap">
+                        <img src="images/website.png" onerror="this.src='https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200'" class="p-image" alt="Mewcin">
+                    </div>
+                    <div class="p-info"><h3>Mewcin</h3><div class="p-cat">Web Development Agency</div></div>
+                </div>
+
+                <!-- <div class="project-card reveal-on-scroll" onclick="openProject(2)">
+                    <div class="p-image-wrap">
+                        <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1200" class="p-image" alt="Flux">
+                    </div>
+                    <div class="p-info"><h3>Flux Identity</h3><div class="p-cat">Branding / Design</div></div>
+                </div> -->
+            </div>
+        </section>
+    </div>
+
+    <footer class="reveal-on-scroll">
+        <div class="container">
+            <a href="mailto:ankandebbarmaa@gmail.com" class="footer-cta">Let's Build<br>The Future.</a>
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 2rem;">
+                <div>
+                    <div style="color: #666; font-size: 0.9rem; margin-bottom: 0.5rem;">CONTACT</div>
+                    <a href="mailto:ankandebbarmaa@gmail.com" style="color: #fff; text-decoration: none; font-size: 1.2rem; display: block;">ankandebbarmaa@gmail.com</a>
+                    <a href="tel:+919233692273" style="color: #fff; text-decoration: none; font-size: 1.2rem; display: block; margin-top: 5px;">+91 9233692273</a>
+                </div>
+                <div class="footer-links">
+                    <a href="https://www.linkedin.com/in/ankandebbarma/" target="_blank">LinkedIn</a>
+                    <a href="https://x.com/ankandebbarmaa" target="_blank">X</a>
+                    <a href="https://instagram.com/ankan.db/" target="_blank">Instagram</a>
+                </div>
+            </div>
+            <div style="margin-top: 4rem; color: #444; font-size: 0.8rem; text-align: center;">© 2026 Ankan Debbarma.</div>
+        </div>
+    </footer>
+
+    <div id="project-modal" class="project-modal">
+        <div class="modal-nav">
+            <div class="logo">Ankan Debbarma</div>
+            <button class="close-btn" onclick="closeProject()">CLOSE ✕</button>
+        </div>
+        <div class="modal-content">
+            <h1 id="m-title" style="font-family: var(--font-head); font-size: clamp(3rem, 6vw, 5rem); line-height: 1; margin-bottom: 1rem;">Title</h1>
+            <p id="m-cat" style="color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3rem;">Category</p>
+            
+            <div id="m-gallery" class="m-grid"></div>
+            
+            <div style="max-width: 800px; margin-top: 4rem;">
+                <h3 style="font-family: var(--font-head); font-size: 1.5rem; margin-bottom: 1rem;">About</h3>
+                <p id="m-desc" style="font-size: 1.2rem; line-height: 1.6; color: var(--text-light);">Description</p>
+                <br>
+                <a id="m-link" href="#" target="_blank" class="call-btn">Visit Website</a>
+            </div>
+            <div style="margin-top: 6rem; padding-top: 4rem; border-top: 1px solid var(--line); text-align: center;">
+                <p style="margin-bottom: 1rem; font-family: var(--font-head); font-size: 1.5rem;">Interested in this?</p>
+                <a href="tel:+919233692273" style="text-decoration: underline; color: var(--accent); font-size: 1.2rem;">Call me: +91 9233692273</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const projectData = {
+            1: { 
+                title: "Mewcin", 
+                cat: "Web Development Agency", 
+                desc: "Co-Founder of Mewcin. Developed the website and manage the creative direction. Built with performance and scalability in mind.", 
+                link: "https://mewcin.com/", 
+                images: [
+                    "images/website.png", 
+                    "images/Mewcin1.png", 
+                    "images/Mewcin2.png"
+                ] 
+            },
+            // 2: { 
+            //     title: "Flux Identity", 
+            //     cat: "Branding", 
+            //     desc: "Brand identity refresh for a Web3 startup. Focused on modern typography and fluid shapes.", 
+            //     link: "#", 
+            //     images: [
+            //         "https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1200", 
+            //         "https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=800"
+            //     ] 
+            // }
+        };
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('preloader').classList.add('hide');
+                document.body.classList.add('loaded');
+                setTimeout(animateText, 500);
+            }, 1000);
+        });
+
+        function animateText() {
+            const title = document.getElementById('hero-title');
+            const walker = document.createTreeWalker(title, NodeFilter.SHOW_TEXT, null, false);
+            let node;
+            while(node = walker.nextNode()) {
+                const chars = node.textContent.trim().split('');
+                if(chars.length > 0) {
+                    const span = document.createElement('span');
+                    chars.forEach((char, index) => {
+                        const c = document.createElement('span');
+                        c.textContent = char; c.className = 'char'; c.style.transitionDelay = `${index * 0.05}s`;
+                        span.appendChild(c);
+                    });
+                    node.parentNode.replaceChild(span, node);
+                }
+            }
+            requestAnimationFrame(() => {
+                document.querySelectorAll('.char').forEach(c => c.classList.add('visible'));
+                document.getElementById('hero-sub').classList.add('visible');
+            });
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('active');
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
+
+        if (window.matchMedia("(pointer: fine)").matches) {
+            const dot = document.querySelector('[data-cursor-dot]');
+            const outline = document.querySelector('[data-cursor-outline]');
+            let mouseX = 0, mouseY = 0, outlineX = 0, outlineY = 0;
+
+            window.addEventListener('mousemove', (e) => { 
+                mouseX = e.clientX; mouseY = e.clientY; 
+                dot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`; 
+            });
+
+            function animateCursor() {
+                outlineX += (mouseX - outlineX) * 0.15; 
+                outlineY += (mouseY - outlineY) * 0.15;
+                outline.style.transform = `translate(${outlineX}px, ${outlineY}px) translate(-50%, -50%)`;
+                requestAnimationFrame(animateCursor);
+            }
+            animateCursor();
+        }
+
+        function openProject(id) {
+            const data = projectData[id];
+            if(!data) return;
+            document.getElementById('m-title').textContent = data.title;
+            document.getElementById('m-cat').textContent = data.cat;
+            document.getElementById('m-desc').textContent = data.desc;
+            document.getElementById('m-link').href = data.link;
+            
+            const gallery = document.getElementById('m-gallery');
+            gallery.innerHTML = '';
+            
+            data.images.forEach((src, index) => {
+                const img = document.createElement('img');
+                img.src = src; 
+                img.className = index === 0 ? 'm-img full' : 'm-img';
+                img.onerror = function() {
+                    this.src = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800'; 
+                };
+                gallery.appendChild(img);
+            });
+            
+            document.getElementById('project-modal').classList.add('active');
+            document.body.classList.add('modal-open');
+        }
+
+        function closeProject() {
+            document.getElementById('project-modal').classList.remove('active');
+            document.body.classList.remove('modal-open');
+        }
+    </script>
+</body>
+</html>
