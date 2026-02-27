@@ -27,7 +27,7 @@
 
         /* --- RESET --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
+        html { scroll-behavior: smooth; overflow-x: hidden; }
         
         body {
             background-color: var(--bg);
@@ -38,6 +38,7 @@
             opacity: 0; 
             transition: opacity 0.5s ease;
             cursor: none; 
+            -webkit-font-smoothing: antialiased;
         }
 
         body.loaded { opacity: 1; }
@@ -65,7 +66,6 @@
             transition: width 0.3s, height 0.3s, background-color 0.3s;
         }
         
-        /* Hover States */
         body:has(a:hover) .cursor-outline, 
         body:has(button:hover) .cursor-outline,
         body:has(.project-card:hover) .cursor-outline,
@@ -77,20 +77,20 @@
         .container { max-width: 1400px; margin: 0 auto; padding: 0 5vw; }
 
         /* --- NAV --- */
-        nav { padding: 2rem 0; display: flex; justify-content: space-between; align-items: center; }
+        nav { padding: 2rem 0; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 1000; }
         
-        /* 2. UPDATED LOGO STYLING */
         .logo { 
             font-family: var(--font-head); 
-            font-weight: 800; /* Extra bold for logo feel */
+            font-weight: 800; 
             font-size: 1.5rem; 
             text-decoration: none; 
             color: var(--text); 
-            z-index: 10;
-            letter-spacing: -0.5px; /* Tighter tracking looks more like a logo */
+            z-index: 1001;
+            letter-spacing: -0.5px; 
+            position: relative;
         }
 
-        .nav-links { display: flex; gap: 3rem; align-items: center; z-index: 10; }
+        .nav-links { display: flex; gap: 3rem; align-items: center; }
         .nav-link { text-decoration: none; color: var(--text); font-size: 0.95rem; font-weight: 500; }
         .call-btn {
             padding: 0.8rem 1.8rem; border: 1px solid var(--text); border-radius: 50px;
@@ -98,12 +98,38 @@
         }
         .call-btn:hover { background: var(--text); color: white; }
 
+        /* --- MOBILE MENU (HAMBURGER) --- */
+        .menu-toggle {
+            display: none; flex-direction: column; justify-content: space-between; 
+            width: 30px; height: 20px; cursor: pointer; z-index: 1001; 
+        }
+        .menu-toggle span { display: block; width: 100%; height: 2px; background-color: var(--text); transition: 0.3s ease; }
+
+        .mobile-menu {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: var(--bg); z-index: 1000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transform: translateY(-100%); transition: transform 0.6s var(--easing);
+        }
+        .mobile-menu.active { transform: translateY(0); }
+        
+        .mobile-nav-links { display: flex; flex-direction: column; gap: 2rem; text-align: center; }
+        .mobile-nav-link { font-family: var(--font-head); font-size: 2.5rem; color: var(--text); text-decoration: none; font-weight: 700; transition: color 0.3s;}
+        .mobile-nav-link:hover { color: var(--accent); }
+
+        /* Dedicated Close Button for Mobile Menu */
+        .mobile-close-btn {
+            position: absolute; top: 1.5rem; right: 1.5rem;
+            background: none; border: none; font-size: 2rem; font-family: var(--font-head);
+            color: var(--text); cursor: pointer; z-index: 1002; display: none;
+        }
+
         /* --- HERO --- */
         .hero { min-height: 80vh; display: flex; flex-direction: column; justify-content: center; }
         .char { display: inline-block; opacity: 0; transform: translateY(100%); transition: transform 0.8s var(--easing), opacity 0.8s; }
         .char.visible { opacity: 1; transform: translateY(0); }
         h1 {
-            font-family: var(--font-head); font-size: clamp(3rem, 9vw, 8.5rem);
+            font-family: var(--font-head); font-size: clamp(3.5rem, 9vw, 8.5rem);
             line-height: 0.9; font-weight: 800; letter-spacing: -0.03em; margin-left: -5px;
             margin-bottom: 2rem;
         }
@@ -186,7 +212,7 @@
             border-bottom: 1px solid var(--line); z-index: 50;
         }
         
-        .close-btn { background: none; border: none; font-family: var(--font-head); font-size: 1.2rem; font-weight: 700; padding: 10px; }
+        .close-btn { background: none; border: none; font-family: var(--font-head); font-size: 1.2rem; font-weight: 700; padding: 10px; cursor: pointer;}
         .modal-content { padding: 4rem 5vw; max-width: 1400px; margin: 0 auto; }
         .m-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 4rem 0; }
         .m-img { width: 100%; height: auto; border-radius: 4px; object-fit: cover; }
@@ -198,18 +224,27 @@
             body { cursor: auto !important; }
             .project-card { cursor: pointer; }
 
-            .nav-links { display: none; }
+            .nav-links { display: none; } 
+            .menu-toggle { display: flex; } 
+            .mobile-close-btn { display: block; } /* Show close button */
+            
             nav { padding: 1.5rem 0; }
+            .logo { font-size: 1.2rem; } 
             
-            /* Logo sizing for mobile so name fits */
-            .logo { font-size: 1.1rem; } 
-            
+            h1 { font-size: clamp(2.5rem, 12vw, 4rem); margin-left: -2px; } 
+            .hero { min-height: 60vh; padding-top: 4rem;}
             .bio-text { font-size: 1.1rem; }
+            
+            .about-section, .experience-section { padding: 4rem 0; } 
+            footer { padding: 4rem 0 2rem; margin-top: 4rem; }
+
             .about-grid, .project-grid, .m-grid { grid-template-columns: 1fr; gap: 2rem; }
+            
             .exp-row { grid-template-columns: 1fr; gap: 0.5rem; padding: 1.5rem 0; }
             .exp-date { text-align: left; grid-row: 1; font-size: 0.8rem; color: var(--accent); margin-bottom: 5px; }
             .exp-company { grid-row: 2; }
             .exp-role { grid-row: 3; }
+            
             .modal-nav { backdrop-filter: none; background: #f2f2ee; }
             .m-img { aspect-ratio: 16/9; }
         }
@@ -235,8 +270,24 @@
                 <a href="#work" class="nav-link">Work</a>
                 <a href="tel:+919233692273" class="call-btn">Let's Talk</a>
             </div>
-            <a href="tel:+919233692273" class="call-btn" style="display: none; @media(max-width:768px){display:block;}">Call</a>
+
+            <div class="menu-toggle" id="mobile-menu-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </nav>
+
+        <div class="mobile-menu" id="mobile-menu">
+            <button class="mobile-close-btn" id="mobile-close-btn">✕</button>
+            
+            <div class="mobile-nav-links">
+                <a href="#about" class="mobile-nav-link">About</a>
+                <a href="#experience" class="mobile-nav-link">Experience</a>
+                <a href="#work" class="mobile-nav-link">Work</a>
+                <a href="tel:+919233692273" class="mobile-nav-link" style="color: var(--accent);">Call Me</a>
+            </div>
+        </div>
 
         <header class="hero">
             <h1 id="hero-title">Creative<br>Developer &<br>Designer.</h1>
@@ -262,7 +313,6 @@
                             <span class="skill-tag">Photoshop</span>
                             <span class="skill-tag">Canva</span>
                             <span class="skill-tag">Management</span>
-                 
                         </div>
                     </div> 
                 </div>
@@ -277,11 +327,6 @@
                     <div class="exp-role">Co-Founder & CEO</div>
                     <div class="exp-date">2025 — Present</div>
                 </div>
-                <!-- <div class="exp-row">
-                    <div class="exp-company">Freelance</div>
-                    <div class="exp-role">Frontend Engineer</div>
-                    <div class="exp-date">2023 — 2025</div>
-                </div> -->
             </div>
         </section>
 
@@ -294,17 +339,10 @@
             <div class="project-grid">
                 <div class="project-card reveal-on-scroll" onclick="openProject(1)">
                     <div class="p-image-wrap">
-                        <img src="images/website.png" onerror="this.src='https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200'" class="p-image" alt="Mewcin">
+                        <img src="images/mainwebsite.png" onerror="this.src='https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200'" class="p-image" alt="Mewcin">
                     </div>
                     <div class="p-info"><h3>Mewcin</h3><div class="p-cat">Web Development Agency</div></div>
                 </div>
-
-                <!-- <div class="project-card reveal-on-scroll" onclick="openProject(2)">
-                    <div class="p-image-wrap">
-                        <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1200" class="p-image" alt="Flux">
-                    </div>
-                    <div class="p-info"><h3>Flux Identity</h3><div class="p-cat">Branding / Design</div></div>
-                </div> -->
             </div>
         </section>
     </div>
@@ -364,19 +402,10 @@
                     "images/Mewcin1.png", 
                     "images/Mewcin2.png"
                 ] 
-            },
-            // 2: { 
-            //     title: "Flux Identity", 
-            //     cat: "Branding", 
-            //     desc: "Brand identity refresh for a Web3 startup. Focused on modern typography and fluid shapes.", 
-            //     link: "#", 
-            //     images: [
-            //         "https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1200", 
-            //         "https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=800"
-            //     ] 
-            // }
+            }
         };
 
+        // Preloader & Text Animation
         window.addEventListener('load', () => {
             setTimeout(() => {
                 document.getElementById('preloader').classList.add('hide');
@@ -407,6 +436,33 @@
             });
         }
 
+        // --- NEW: Mobile Menu Logic ---
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileCloseBtn = document.getElementById('mobile-close-btn');
+        const mobileLinks = document.querySelectorAll('.mobile-nav-link');
+
+        // Open Menu
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.add('active');
+            document.body.classList.add('modal-open');
+        });
+
+        // Close Menu via 'X' button
+        mobileCloseBtn.addEventListener('click', () => {
+            mobileMenu.classList.remove('active');
+            document.body.classList.remove('modal-open');
+        });
+
+        // Close Menu when a link is clicked
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+                document.body.classList.remove('modal-open');
+            });
+        });
+
+        // Scroll Reveal
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) entry.target.classList.add('active');
@@ -414,6 +470,7 @@
         }, { threshold: 0.1 });
         document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
 
+        // Desktop Cursor
         if (window.matchMedia("(pointer: fine)").matches) {
             const dot = document.querySelector('[data-cursor-dot]');
             const outline = document.querySelector('[data-cursor-outline]');
@@ -433,6 +490,7 @@
             animateCursor();
         }
 
+        // Project Modal Logic
         function openProject(id) {
             const data = projectData[id];
             if(!data) return;
